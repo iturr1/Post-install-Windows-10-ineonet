@@ -159,196 +159,123 @@ function Energy-Config-Option {
 
 ################################################################################################################
 
-function Power-Saver-Plan {
-    Write-Host 
-    "`nConfiguration d'energie
-    `n
-    `nPlan d'alimentation économizeur d'énergie"
-    Button-Power-Saver-Plan
-    Sector-Lid-Power-Saver-Plan
-    Battery-Lid-Power-Saver-Plan
-}
-
-
-
-function Button-Power-Saver-Plan {
-    Energy-Config-Option
-    $buttonPowerSave = Read-Host -Prompt "`nChoisissez l'action en appuyant le bouton d'alimentation"
-    switch ($buttonPowerSave) {
-        0 {powercfg.exe /SETDCVALUEINDEX SCHEME_MIN SUB_BUTTONS PBUTTONACTION 000} 
-        1 {powercfg.exe /SETDCVALUEINDEX SCHEME_MIN SUB_BUTTONS PBUTTONACTION 001}
-        2 {powercfg.exe /SETDCVALUEINDEX SCHEME_MIN SUB_BUTTONS PBUTTONACTION 002}
-        3 {powercfg.exe /SETDCVALUEINDEX SCHEME_MIN SUB_BUTTONS PBUTTONACTION 003}
+function Set-Menu-Plan-Options 
+{
+    param
+    ($buttonLidPowerScheme, $batteryMains, $energyScheme, $buttonLidAction, $currentFunction)
+    switch ($buttonLidPowerScheme) {
+        0 {powercfg.exe /SET"$batteryMains"VALUEINDEX SCHEME_"$energyScheme" SUB_BUTTONS "$buttonLidAction"ACTION 000} 
+        1 {powercfg.exe /SET"$batteryMains"VALUEINDEX SCHEME_"$energyScheme" SUB_BUTTONS "$buttonLidAction"ACTION 001}
+        2 {powercfg.exe /SET"$batteryMains"VALUEINDEX SCHEME_"$energyScheme" SUB_BUTTONS "$buttonLidAction"ACTION 002}
+        3 {powercfg.exe /SET"$batteryMains"VALUEINDEX SCHEME_"$energyScheme" SUB_BUTTONS "$buttonLidAction"ACTION 003}
         Default {
             Write-Host "`nL'option n'existe pas"
-            Start-Sleep -Seconds 1
-            Button-Power-Saver-Plan
+            Start-Sleep -Seconds 0.5
+            $(& $currentFunction)
+
         }
     } 
 }
 
-function Sector-Lid-Power-Saver-Plan {
+
+function Set-Button-Power-Saver-Plan {
     Energy-Config-Option
-    $sectorLidPowerSave = Read-Host -Prompt "`nChoisissez l'action en fermant le capot sur secteur"
-    switch ($sectorLidPowerSave) {
-        0 {powercfg.exe /SETACVALUEINDEX SCHEME_MIN SUB_BUTTONS LIDACTION 000} 
-        1 {powercfg.exe /SETACVALUEINDEX SCHEME_MIN SUB_BUTTONS LIDACTION 001}
-        2 {powercfg.exe /SETACVALUEINDEX SCHEME_MIN SUB_BUTTONS LIDACTION 002}
-        3 {powercfg.exe /SETACVALUEINDEX SCHEME_MIN SUB_BUTTONS LIDACTION 003}
-        Default {
-            Write-Host "`nL'option n'existe pas"
-            Start-Sleep -Seconds 1
-            Sector-Lid-Power-Saver-Plan
-        }
-    } 
+    $buttonDcMin = Read-Host -Prompt "`nChoisissez l'action en appuyant le bouton d'alimentation"
+    Set-Menu-Plan-Options  -buttonLidPowerScheme $buttonDcMin -batteryMains "DC" -energyScheme "MIN" `
+    -buttonLidAction "PBUTTON" -currentFunction {Set-Button-Power-Saver-Plan}    
+}
+
+function Set-Sector-Lid-Power-Saver-Plan {
+    Energy-Config-Option
+    $LidAcMin = Read-Host -Prompt "`nChoisissez l'action en fermant le capot sur secteur"
+    Set-Menu-Plan-Options  -buttonLidPowerScheme $LidAcMin -batteryMains "AC" -energyScheme "MIN" `
+    -buttonLidAction "LID" -currentFunction {Set-Sector-Lid-Power-Saver-Plan}
 }      
 
-function Battery-Lid-Power-Saver-Plan {
+function Set-Battery-Lid-Power-Saver-Plan {
     Energy-Config-Option
-    $batteryLidPowerSave = Read-Host -Prompt "`nChoisissez l'action en fermant le capot sur batterie"
-    switch ($batteryLidPowerSave) {
-        0 {powercfg.exe /SETDCVALUEINDEX SCHEME_MIN SUB_BUTTONS LIDACTION 000} 
-        1 {powercfg.exe /SETDCVALUEINDEX SCHEME_MIN SUB_BUTTONS LIDACTION 001}
-        2 {powercfg.exe /SETDCVALUEINDEX SCHEME_MIN SUB_BUTTONS LIDACTION 002}
-        3 {powercfg.exe /SETDCVALUEINDEX SCHEME_MIN SUB_BUTTONS LIDACTION 003}
-        Default {
-            Write-Host "`nL'option n'existe pas"
-            Start-Sleep -Seconds 1
-            Battery-Lid-Power-Saver-Plan
-        }
-    } 
-}   
+    $LidDcMin = Read-Host -Prompt "`nChoisissez l'action en fermant le capot sur batterie"
+    Set-Menu-Plan-Options  -buttonLidPowerScheme $lidDcMin -batteryMains "DC" -energieScheme "MIN" `
+    -buttonLidAction "LID" -currentFunction {Set-Battery-Lid-Power-Saver-Plan}
+}  
+
+function Set-Power-Saver-Plan {
+    Write-Host 
+    "`nConfiguration d'energie `n `nPlan d'alimentation économizeur d'énergie"
+    Set-Button-Power-Saver-Plan
+    Set-Sector-Lid-Power-Saver-Plan
+    Set-Battery-Lid-Power-Saver-Plan
+}
 
 ################################################################################################################
 
-function High-Performance-Plan {
+
+function Set-Button-High-Performance-Plan {
+    Energy-Config-Option
+    $buttonDcHigh = Read-Host -Prompt "`nChoisissez l'action en appuyant le bouton d'alimentation"
+    Set-Menu-Plan-Options  -buttonLidPowerScheme $buttonDcHigh -batteryMains "DC" -energieScheme "MAX" `
+    -buttonLidAction "PBUTTON" -currentFunction {Set-Battery-Lid-Power-Saver-Plan}
+}
+
+function Set-Sector-Lid-High-Performance-Plan {
+    Energy-Config-Option
+    $lidAcHigh = Read-Host -Prompt "`nChoisissez l'action en fermant le capot sur secteur"
+    Set-Menu-Plan-Options  -buttonLidPowerScheme $lidAcHigh -batteryMains "AC" -energieScheme "MAX" `
+    -buttonLidAction "LID" -currentFunction {Set-Battery-Lid-Power-Saver-Plan}
+}      
+
+function Set-Battery-Lid-High-Performance-Plan {
+    Energy-Config-Option
+    $lidDcHigh = Read-Host -Prompt "`nChoisissez l'action en fermant le capot sur batterie"
+    Set-Menu-Plan-Options  -buttonLidPowerScheme $lidDcHigh -batteryMains "DC" -energieScheme "MAX" `
+    -buttonLidAction "LID" -currentFunction {Set-Battery-Lid-Power-Saver-Plan}
+}   
+
+
+function Set-High-Performance-Plan {
     Write-Host 
-    "`nConfiguration d'energie
-    `n
-    `nPlan d'alimentation hautes performances"
+    "`nConfiguration d'energie `n `nPlan d'alimentation hautes performances"
     Button-High-Performance-Plan
     Sector-Lid-High-Performance-Plan
     Battery-Lid-High-Performance-Plan
 }
-
-
-
-function Button-High-Performance-Plan {
-    Energy-Config-Option
-    $buttonHighPerformance = Read-Host -Prompt "`nChoisissez l'action en appuyant le bouton d'alimentation"
-    switch ($buttonHighPerformance) {
-        0 {powercfg.exe /SETDCVALUEINDEX SCHEME_MAX SUB_BUTTONS PBUTTONACTION 000} 
-        1 {powercfg.exe /SETDCVALUEINDEX SCHEME_MAX SUB_BUTTONS PBUTTONACTION 001}
-        2 {powercfg.exe /SETDCVALUEINDEX SCHEME_MAX SUB_BUTTONS PBUTTONACTION 002}
-        3 {powercfg.exe /SETDCVALUEINDEX SCHEME_MAX SUB_BUTTONS PBUTTONACTION 003}
-        Default {
-            Write-Host "`nL'option n'existe pas"
-            Start-Sleep -Seconds 1
-            Button-High-Performance-Plan
-        }
-    } 
-}
-
-function Sector-Lid-High-Performance-Plan {
-    Energy-Config-Option
-    $sectorLidHighPerformance = Read-Host -Prompt "`nChoisissez l'action en fermant le capot sur secteur"
-    switch ($sectorLidHighPerformance) {
-        0 {powercfg.exe /SETDCVALUEINDEX SCHEME_MAX SUB_BUTTONS LIDACTION 000} 
-        1 {powercfg.exe /SETDCVALUEINDEX SCHEME_MAX SUB_BUTTONS LIDACTION 001}
-        2 {powercfg.exe /SETDCVALUEINDEX SCHEME_MAX SUB_BUTTONS LIDACTION 002}
-        3 {powercfg.exe /SETDCVALUEINDEX SCHEME_MAX SUB_BUTTONS LIDACTION 003}
-        Default {
-            Write-Host "`nL'option n'existe pas"
-            Start-Sleep -Seconds 1
-            Sector-Lid-High-Performance-Plan
-        }
-    } 
-}      
-
-function Battery-Lid-High-Performance-Plan {
-    Energy-Config-Option
-    $batteryLidHighPerformance = Read-Host -Prompt "`nChoisissez l'action en fermant le capot sur batterie"
-    switch ($batteryLidHighPerformance) {
-        0 {powercfg.exe /SETDCVALUEINDEX SCHEME_MAX SUB_BUTTONS LIDACTION 000} 
-        1 {powercfg.exe /SETDCVALUEINDEX SCHEME_MAX SUB_BUTTONS LIDACTION 001}
-        2 {powercfg.exe /SETDCVALUEINDEX SCHEME_MAX SUB_BUTTONS LIDACTION 002}
-        3 {powercfg.exe /SETDCVALUEINDEX SCHEME_MAX SUB_BUTTONS LIDACTION 003}
-        Default {
-            Write-Host "`nL'option n'existe pas"
-            Start-Sleep -Seconds 1
-            Battery-Lid-High-Performance-Plan
-        }
-    } 
-}   
-
 ################################################################################################################
 
-function Balanced-Plan {
+function Set-Button-Balanced-Plan {
+    Energy-Config-Option
+    $buttonDcBalanced = Read-Host -Prompt "Choisissez l'action en appuyant le bouton d'alimentation"
+    Set-Menu-Plan-Options  -buttonLidPowerScheme $buttonDcBalanced -batteryMains "DC" -energieScheme "BALANCED" `
+    -buttonLidAction "PBUTTON" -currentFunction {Set-Battery-Lid-Power-Saver-Plan}}
+
+function Set-Sector-Lid-Balanced-Plan {
+    Energy-Config-Option
+    $lidAcBalanced = Read-Host -Prompt "Choisissez l'action en fermant le capot sur secteur"
+    Set-Menu-Plan-Options  -buttonLidPowerScheme $lidAcBalanced -batteryMains "DC" -energieScheme "BALANCED" `
+    -buttonLidAction "LID" -currentFunction {Set-Battery-Lid-Power-Saver-Plan}
+}      
+
+function Set-Battery-Lid-Balanced-Plan {
+    Energy-Config-Option
+    $lidDcBalanced = Read-Host -Prompt "Choisissez l'action en fermant le capot sur batterie"
+    Set-Menu-Plan-Options  -buttonLidPowerScheme $lidDcBalanced -batteryMains "DC" -energieScheme "BALANCED" `
+    -buttonLidAction "LID" -currentFunction {Set-Battery-Lid-Power-Saver-Plan}
+}   
+
+function Set-Balanced-Plan {
     Write-Host 
     "`nConfiguration d'energie
     `n
     `nPlan d'alimentation équilibré"
-    Button-Balanced-Plan
-    Sector-Lid-Balanced-Plan
-    Battery-Lid-Balanced-Plan
+    Set-Button-Balanced-Plan
+    Set-Sector-Lid-Balanced-Plan
+    Set-Battery-Lid-Balanced-Plan
 }
-
-
-
-function Button-Balanced-Plan {
-    Energy-Config-Option
-    $buttonBalanced = Read-Host -Prompt "Choisissez l'action en appuyant le bouton d'alimentation"
-    switch ($buttonBalanced) {
-        0 {powercfg.exe /SETDCVALUEINDEX SCHEME_BALANCED SUB_BUTTONS PBUTTONACTION 000} 
-        1 {powercfg.exe /SETDCVALUEINDEX SCHEME_BALANCED SUB_BUTTONS PBUTTONACTION 001}
-        2 {powercfg.exe /SETDCVALUEINDEX SCHEME_BALANCED SUB_BUTTONS PBUTTONACTION 002}
-        3 {powercfg.exe /SETDCVALUEINDEX SCHEME_BALANCED SUB_BUTTONS PBUTTONACTION 003}
-        
-        Default {
-            Write-Host "L'option n'existe pas"
-            Start-Sleep -Seconds 1
-            Button-Balanced-Plan
-        }
-    } 
-}
-
-function Sector-Lid-Balanced-Plan {
-    Energy-Config-Option
-    $sectorLidBalanced = Read-Host -Prompt "Choisissez l'action en fermant le capot sur secteur"
-    switch ($sectorLidBalanced) {
-        0 {powercfg.exe /SETDCVALUEINDEX SCHEME_BALANCED SUB_BUTTONS LIDACTION 000} 
-        1 {powercfg.exe /SETDCVALUEINDEX SCHEME_BALANCED SUB_BUTTONS LIDACTION 001}
-        2 {powercfg.exe /SETDCVALUEINDEX SCHEME_BALANCED SUB_BUTTONS LIDACTION 002}
-        3 {powercfg.exe /SETDCVALUEINDEX SCHEME_BALANCED SUB_BUTTONS LIDACTION 003}
-        Default {
-            Write-Host "L'option n'existe pas"
-            Start-Sleep -Seconds 1
-            Sector-Lid-Balanced-Plan
-        }
-    } 
-}      
-
-function Battery-Lid-Balanced-Plan {
-    Energy-Config-Option
-    $batteryLidBalanced = Read-Host -Prompt "Choisissez l'action en fermant le capot sur batterie"
-    switch ($batteryLidBalanced) {
-        0 {powercfg.exe /SETDCVALUEINDEX SCHEME_BALANCED SUB_BUTTONS LIDACTION 000} 
-        1 {powercfg.exe /SETDCVALUEINDEX SCHEME_BALANCED SUB_BUTTONS LIDACTION 001}
-        2 {powercfg.exe /SETDCVALUEINDEX SCHEME_BALANCED SUB_BUTTONS LIDACTION 002}
-        3 {powercfg.exe /SETDCVALUEINDEX SCHEME_BALANCED SUB_BUTTONS LIDACTION 003}
-        Default {
-            Write-Host "L'option n'existe pas"
-            Start-Sleep -Seconds 1
-            Battery-Lid-Balanced-Plan
-        }
-    } 
-}   
 
 ################################################################################################################
 
-Power-Saver-Plan
-High-Performance-Plan
-Balanced-Plan
+Set-Power-Saver-Plan
+Set-High-Performance-Plan
+Set-Balanced-Plan
 
 <################################################################################################################
 Configuration des registres
