@@ -8,7 +8,12 @@ Source : https://github.com/iturr1/Post-install-Windows-10-ineonet.git
 Post-installation Windows 10.
 
 .DESCRIPTION
-Sript d'installation des programmes utiles et désintallation des programmes inutiles à la suite d'une installation Windows 10.
+Sript post-installation Windows 10 :
+-> installation des programmes utiles et désintallation des programmes inutiles 
+-> configuration d'énergie
+-> désactivation d'UAC (User Access Control)
+-> désactivation Actualitées Windows
+-> creation d'un administrateur local
 
 ##################################################
 Instrution d'exécution du script :
