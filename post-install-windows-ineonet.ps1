@@ -168,10 +168,10 @@ function Set-MenuPlanOptions
     param
     ($buttonLidPowerScheme, $batteryMains, $energyScheme, $buttonLidAction, $currentFunction)
     switch ($buttonLidPowerScheme) {
-        0 {powercfg.exe /SET$($batteryMains)VALUEINDEX SCHEME_$energyScheme SUB_BUTTONS $($buttonLidAction)ACTION 000} 
-        1 {powercfg.exe /SET$($batteryMains)VALUEINDEX SCHEME_$energyScheme SUB_BUTTONS $($buttonLidAction)ACTION 001}
-        2 {powercfg.exe /SET$($batteryMains)VALUEINDEX SCHEME_$energyScheme SUB_BUTTONS $($buttonLidAction)ACTION 002}
-        3 {powercfg.exe /SET$($batteryMains)VALUEINDEX SCHEME_$energyScheme SUB_BUTTONS $($buttonLidAction)ACTION 003}
+        0 {invoke-expression "powercfg.exe /SET$($batteryMains)VALUEINDEX SCHEME_$energyScheme SUB_BUTTONS $($buttonLidAction)ACTION 000"} 
+        1 {invoke-expression "powercfg.exe /SET$($batteryMains)VALUEINDEX SCHEME_$energyScheme SUB_BUTTONS $($buttonLidAction)ACTION 001"}
+        2 {invoke-expression "powercfg.exe /SET$($batteryMains)VALUEINDEX SCHEME_$energyScheme SUB_BUTTONS $($buttonLidAction)ACTION 002"}
+        3 {invoke-expression "powercfg.exe /SET$($batteryMains)VALUEINDEX SCHEME_$energyScheme SUB_BUTTONS $($buttonLidAction)ACTION 003"}
         Default {
             Write-Host "`nL'option n'existe pas"
             Start-Sleep -Seconds 0.5
