@@ -186,7 +186,7 @@ function Set-ButtonPowerSaverPlan {
     Set-EnergyConfigOption
     $buttonDcMin = Read-Host -Prompt "`nChoisissez l'action en appuyant le bouton d'alimentation"
     Set-Menu-Plan-Options  -buttonLidPowerScheme $buttonDcMin -batteryMains "DC" -energyScheme "MIN" `
-    -buttonLidAction "PBUTTON" -currentFunction {Set-Button-Power-Saver-Plan}    
+    -buttonLidAction "PBUTTON" -currentFunction {Set-ButtonPowerSaverPlan}    
 }
 
 function Set-SectorLidPowerSaverPlan {
