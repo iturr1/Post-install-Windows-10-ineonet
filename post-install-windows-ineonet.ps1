@@ -183,23 +183,23 @@ function Set-MenuPlanOptions
 
 
 function Set-ButtonPowerSaverPlan {
-    Set-EnergyConfigOption
+    Get-EnergyConfigOption
     $buttonDcMin = Read-Host -Prompt "`nChoisissez l'action en appuyant le bouton d'alimentation"
-    Set-Menu-Plan-Options  -buttonLidPowerScheme $buttonDcMin -batteryMains "DC" -energyScheme "MIN" `
+    Set-MenuPlanOptions  -buttonLidPowerScheme $buttonDcMin -batteryMains "DC" -energyScheme "MIN" `
     -buttonLidAction "PBUTTON" -currentFunction {Set-ButtonPowerSaverPlan}    
 }
 
 function Set-SectorLidPowerSaverPlan {
-    Set-EnergyConfigOption
+    Get-EnergyConfigOption
     $LidAcMin = Read-Host -Prompt "`nChoisissez l'action en fermant le capot sur secteur"
-    Set-Menu-Plan-Options  -buttonLidPowerScheme $LidAcMin -batteryMains "AC" -energyScheme "MIN" `
+    Set-MenuPlanOptions  -buttonLidPowerScheme $LidAcMin -batteryMains "AC" -energyScheme "MIN" `
     -buttonLidAction "LID" -currentFunction {Set-SectorLidPowerSaverPlan}
 }      
 
 function Set-BatteryLidPowerSaverPlan {
-    Set-EnergyConfigOption
+    Get-EnergyConfigOption
     $LidDcMin = Read-Host -Prompt "`nChoisissez l'action en fermant le capot sur batterie"
-    Set-Menu-Plan-Options  -buttonLidPowerScheme $lidDcMin -batteryMains "DC" -energieScheme "MIN" `
+    Set-MenuPlanOptions  -buttonLidPowerScheme $lidDcMin -batteryMains "DC" -energieScheme "MIN" `
     -buttonLidAction "LID" -currentFunction {Set-BatteryLidPowerSaverPlan}
 }  
 
@@ -215,23 +215,23 @@ function Set-PowerSaverPlan {
 
 
 function Set-ButtonHighPerformancePlan {
-    Set-EnergyConfigOption
+    Get-EnergyConfigOption
     $buttonDcHigh = Read-Host -Prompt "`nChoisissez l'action en appuyant le bouton d'alimentation"   
-    Set-Menu-Plan-Options  -buttonLidPowerScheme $buttonDcHigh -batteryMains "DC" -energieScheme "MAX" `
+    Set-MenuPlanOptions  -buttonLidPowerScheme $buttonDcHigh -batteryMains "DC" -energieScheme "MAX" `
     -buttonLidAction "PBUTTON" -currentFunction {Set-ButtonHighPerformancePlan}
 }
 
 function Set-SectorLidHighPerformancePlan {
-    Set-EnergyConfigOption
+    Get-EnergyConfigOption
     $lidAcHigh = Read-Host -Prompt "`nChoisissez l'action en fermant le capot sur secteur"
-    Set-Menu-Plan-Options  -buttonLidPowerScheme $lidAcHigh -batteryMains "AC" -energieScheme "MAX" `
+    Set-MenuPlanOptions  -buttonLidPowerScheme $lidAcHigh -batteryMains "AC" -energieScheme "MAX" `
     -buttonLidAction "LID" -currentFunction {Set-SectorLidHighPerformancePlan}
 }      
 
 function Set-BatteryLidHighPerformancePlan {
-    Set-EnergyConfigOption
+    Get-EnergyConfigOption
     $lidDcHigh = Read-Host -Prompt "`nChoisissez l'action en fermant le capot sur batterie"
-    Set-Menu-Plan-Options  -buttonLidPowerScheme $lidDcHigh -batteryMains "DC" -energieScheme "MAX" `
+    Set-MenuPlanOptions  -buttonLidPowerScheme $lidDcHigh -batteryMains "DC" -energieScheme "MAX" `
     -buttonLidAction "LID" -currentFunction {Set-BatteryLidHighPerformancePlan}
 }   
 
@@ -246,22 +246,22 @@ function Set-HighPerformancePlan {
 ################################################################################################################
 
 function Set-ButtonBalancedPlan {
-    Set-EnergyConfigOption
+    Get-EnergyConfigOption
     $buttonDcBalanced = Read-Host -Prompt "Choisissez l'action en appuyant le bouton d'alimentation"
-    Set-Menu-Plan-Options  -buttonLidPowerScheme $buttonDcBalanced -batteryMains "DC" -energieScheme "BALANCED" `
+    Set-MenuPlanOptions  -buttonLidPowerScheme $buttonDcBalanced -batteryMains "DC" -energieScheme "BALANCED" `
     -buttonLidAction "PBUTTON" -currentFunction {Set-ButtonBalancedPlan}}
 
 function Set-SectorLidBalancedPlan {
-    Set-EnergyConfigOption
+    Get-EnergyConfigOption
     $lidAcBalanced = Read-Host -Prompt "Choisissez l'action en fermant le capot sur secteur"
-    Set-Menu-Plan-Options  -buttonLidPowerScheme $lidAcBalanced -batteryMains "DC" -energieScheme "BALANCED" `
+    Set-MenuPlanOptions  -buttonLidPowerScheme $lidAcBalanced -batteryMains "DC" -energieScheme "BALANCED" `
     -buttonLidAction "LID" -currentFunction {Set-SectorLidBalancedPlan}
 }      
 
 function Set-BatteryLidBalancedPlan {
-    Set-EnergyConfigOption
+    Get-EnergyConfigOption
     $lidDcBalanced = Read-Host -Prompt "Choisissez l'action en fermant le capot sur batterie"
-    Set-Menu-Plan-Options  -buttonLidPowerScheme $lidDcBalanced -batteryMains "DC" -energieScheme "BALANCED" `
+    Set-MenuPlanOptions  -buttonLidPowerScheme $lidDcBalanced -batteryMains "DC" -energieScheme "BALANCED" `
     -buttonLidAction "LID" -currentFunction {Set-BatteryLidBalancedPlan}
 }   
 
