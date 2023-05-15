@@ -10,6 +10,7 @@ Post-installation Windows 10.
 .DESCRIPTION
 Sript post-installation Windows 10 :
 -> installation des programmes utiles et désintallation des programmes inutiles 
+-> activation / désactivation fonctionaliées Windows
 -> configuration d'énergie
 -> désactivation d'UAC (User Access Control)
 -> désactivation Actualitées Windows
@@ -118,10 +119,10 @@ Activer / Désactiver fonctionaliées Windows
 ################################################################################################################>
 
 
-#Aciver SMB/CIFS
+#Activer SMB/CIFS
 Enable-WindowsOptionalFeature -FeatureName SMB1Protocol -Online -NoRestart
 Enable-WindowsOptionalFeature -FeatureName SMB1Protocol-Client -Online -NoRestart
-Enable-WindowsOptionalFeature -FeatureName SMB1Protocol-Serve -Online -NoRestart
+Enable-WindowsOptionalFeature -FeatureName SMB1Protocol-Server -Online -NoRestart
 Enable-WindowsOptionalFeature -FeatureName SmbDirect -Online -NoRestart
 
 #Activation Framework .NET
@@ -154,7 +155,7 @@ Options :
 3 -> Eteindre : Le système s’arrête lorsque le couvercle du système est fermé.
 ################################################################################################################>
 
-function Energy-Config-Option {
+function Get-EnergyConfigOption {
     Write-Host "Option :
     `n0 -> Ne rien faire : Aucune action n’est effectuée lorsque le couvercle du système est fermé.
     `n1 -> Veille : Le système entre en veille lorsque le couvercle du système est fermé.
@@ -162,17 +163,15 @@ function Energy-Config-Option {
     `n3 -> Eteindre : Le système s’arrête lorsque le couvercle du système est fermé."
 }
 
-################################################################################################################
-
-function Set-Menu-Plan-Options 
+function Set-MenuPlanOptions 
 {
     param
     ($buttonLidPowerScheme, $batteryMains, $energyScheme, $buttonLidAction, $currentFunction)
     switch ($buttonLidPowerScheme) {
-        0 {powercfg.exe /SET"$batteryMains"VALUEINDEX SCHEME_"$energyScheme" SUB_BUTTONS "$buttonLidAction"ACTION 000} 
-        1 {powercfg.exe /SET"$batteryMains"VALUEINDEX SCHEME_"$energyScheme" SUB_BUTTONS "$buttonLidAction"ACTION 001}
-        2 {powercfg.exe /SET"$batteryMains"VALUEINDEX SCHEME_"$energyScheme" SUB_BUTTONS "$buttonLidAction"ACTION 002}
-        3 {powercfg.exe /SET"$batteryMains"VALUEINDEX SCHEME_"$energyScheme" SUB_BUTTONS "$buttonLidAction"ACTION 003}
+        0 {powercfg.exe /SET$($batteryMains)VALUEINDEX SCHEME_$energyScheme SUB_BUTTONS $($buttonLidAction)ACTION 000} 
+        1 {powercfg.exe /SET$($batteryMains)VALUEINDEX SCHEME_$energyScheme SUB_BUTTONS $($buttonLidAction)ACTION 001}
+        2 {powercfg.exe /SET$($batteryMains)VALUEINDEX SCHEME_$energyScheme SUB_BUTTONS $($buttonLidAction)ACTION 002}
+        3 {powercfg.exe /SET$($batteryMains)VALUEINDEX SCHEME_$energyScheme SUB_BUTTONS $($buttonLidAction)ACTION 003}
         Default {
             Write-Host "`nL'option n'existe pas"
             Start-Sleep -Seconds 0.5
@@ -183,104 +182,101 @@ function Set-Menu-Plan-Options
 }
 
 
-function Set-Button-Power-Saver-Plan {
-    Energy-Config-Option
+function Set-ButtonPowerSaverPlan {
+    Set-EnergyConfigOption
     $buttonDcMin = Read-Host -Prompt "`nChoisissez l'action en appuyant le bouton d'alimentation"
     Set-Menu-Plan-Options  -buttonLidPowerScheme $buttonDcMin -batteryMains "DC" -energyScheme "MIN" `
     -buttonLidAction "PBUTTON" -currentFunction {Set-Button-Power-Saver-Plan}    
 }
 
-function Set-Sector-Lid-Power-Saver-Plan {
-    Energy-Config-Option
+function Set-SectorLidPowerSaverPlan {
+    Set-EnergyConfigOption
     $LidAcMin = Read-Host -Prompt "`nChoisissez l'action en fermant le capot sur secteur"
     Set-Menu-Plan-Options  -buttonLidPowerScheme $LidAcMin -batteryMains "AC" -energyScheme "MIN" `
-    -buttonLidAction "LID" -currentFunction {Set-Sector-Lid-Power-Saver-Plan}
+    -buttonLidAction "LID" -currentFunction {Set-SectorLidPowerSaverPlan}
 }      
 
-function Set-Battery-Lid-Power-Saver-Plan {
-    Energy-Config-Option
+function Set-BatteryLidPowerSaverPlan {
+    Set-EnergyConfigOption
     $LidDcMin = Read-Host -Prompt "`nChoisissez l'action en fermant le capot sur batterie"
     Set-Menu-Plan-Options  -buttonLidPowerScheme $lidDcMin -batteryMains "DC" -energieScheme "MIN" `
-    -buttonLidAction "LID" -currentFunction {Set-Battery-Lid-Power-Saver-Plan}
+    -buttonLidAction "LID" -currentFunction {Set-BatteryLidPowerSaverPlan}
 }  
 
-function Set-Power-Saver-Plan {
+function Set-PowerSaverPlan {
     Write-Host 
     "`nConfiguration d'energie `n `nPlan d'alimentation économizeur d'énergie"
-    Set-Button-Power-Saver-Plan
-    Set-Sector-Lid-Power-Saver-Plan
-    Set-Battery-Lid-Power-Saver-Plan
+    Set-ButtonPowerSaverPlan
+    Set-SectorLidPowerSaverPlan
+    Set-BatteryLidPowerSaverPlan
 }
 
 ################################################################################################################
 
 
-function Set-Button-High-Performance-Plan {
-    Energy-Config-Option
-    $buttonDcHigh = Read-Host -Prompt "`nChoisissez l'action en appuyant le bouton d'alimentation"
+function Set-ButtonHighPerformancePlan {
+    Set-EnergyConfigOption
+    $buttonDcHigh = Read-Host -Prompt "`nChoisissez l'action en appuyant le bouton d'alimentation"   
     Set-Menu-Plan-Options  -buttonLidPowerScheme $buttonDcHigh -batteryMains "DC" -energieScheme "MAX" `
-    -buttonLidAction "PBUTTON" -currentFunction {Set-Battery-Lid-Power-Saver-Plan}
+    -buttonLidAction "PBUTTON" -currentFunction {Set-ButtonHighPerformancePlan}
 }
 
-function Set-Sector-Lid-High-Performance-Plan {
-    Energy-Config-Option
+function Set-SectorLidHighPerformancePlan {
+    Set-EnergyConfigOption
     $lidAcHigh = Read-Host -Prompt "`nChoisissez l'action en fermant le capot sur secteur"
     Set-Menu-Plan-Options  -buttonLidPowerScheme $lidAcHigh -batteryMains "AC" -energieScheme "MAX" `
-    -buttonLidAction "LID" -currentFunction {Set-Battery-Lid-Power-Saver-Plan}
+    -buttonLidAction "LID" -currentFunction {Set-SectorLidHighPerformancePlan}
 }      
 
-function Set-Battery-Lid-High-Performance-Plan {
-    Energy-Config-Option
+function Set-BatteryLidHighPerformancePlan {
+    Set-EnergyConfigOption
     $lidDcHigh = Read-Host -Prompt "`nChoisissez l'action en fermant le capot sur batterie"
     Set-Menu-Plan-Options  -buttonLidPowerScheme $lidDcHigh -batteryMains "DC" -energieScheme "MAX" `
-    -buttonLidAction "LID" -currentFunction {Set-Battery-Lid-Power-Saver-Plan}
+    -buttonLidAction "LID" -currentFunction {Set-BatteryLidHighPerformancePlan}
 }   
 
 
-function Set-High-Performance-Plan {
+function Set-HighPerformancePlan {
     Write-Host 
     "`nConfiguration d'energie `n `nPlan d'alimentation hautes performances"
-    Button-High-Performance-Plan
-    Sector-Lid-High-Performance-Plan
-    Battery-Lid-High-Performance-Plan
+    Set-ButtonHighPerformancePlan
+    Set-SectorLidHighPerformancePlan
+    Set-BatteryLidHighPerformancePlan
 }
 ################################################################################################################
 
-function Set-Button-Balanced-Plan {
-    Energy-Config-Option
+function Set-ButtonBalancedPlan {
+    Set-EnergyConfigOption
     $buttonDcBalanced = Read-Host -Prompt "Choisissez l'action en appuyant le bouton d'alimentation"
     Set-Menu-Plan-Options  -buttonLidPowerScheme $buttonDcBalanced -batteryMains "DC" -energieScheme "BALANCED" `
-    -buttonLidAction "PBUTTON" -currentFunction {Set-Battery-Lid-Power-Saver-Plan}}
+    -buttonLidAction "PBUTTON" -currentFunction {Set-ButtonBalancedPlan}}
 
-function Set-Sector-Lid-Balanced-Plan {
-    Energy-Config-Option
+function Set-SectorLidBalancedPlan {
+    Set-EnergyConfigOption
     $lidAcBalanced = Read-Host -Prompt "Choisissez l'action en fermant le capot sur secteur"
     Set-Menu-Plan-Options  -buttonLidPowerScheme $lidAcBalanced -batteryMains "DC" -energieScheme "BALANCED" `
-    -buttonLidAction "LID" -currentFunction {Set-Battery-Lid-Power-Saver-Plan}
+    -buttonLidAction "LID" -currentFunction {Set-SectorLidBalancedPlan}
 }      
 
-function Set-Battery-Lid-Balanced-Plan {
-    Energy-Config-Option
+function Set-BatteryLidBalancedPlan {
+    Set-EnergyConfigOption
     $lidDcBalanced = Read-Host -Prompt "Choisissez l'action en fermant le capot sur batterie"
     Set-Menu-Plan-Options  -buttonLidPowerScheme $lidDcBalanced -batteryMains "DC" -energieScheme "BALANCED" `
-    -buttonLidAction "LID" -currentFunction {Set-Battery-Lid-Power-Saver-Plan}
+    -buttonLidAction "LID" -currentFunction {Set-BatteryLidBalancedPlan}
 }   
 
-function Set-Balanced-Plan {
+function Set-BalancedPlan {
     Write-Host 
-    "`nConfiguration d'energie
-    `n
-    `nPlan d'alimentation équilibré"
-    Set-Button-Balanced-Plan
-    Set-Sector-Lid-Balanced-Plan
-    Set-Battery-Lid-Balanced-Plan
+    "`nConfiguration d'energie `n`nPlan d'alimentation équilibré"
+    Set-ButtonBalancedPlan
+    Set-SectorLidBalancedPlan
+    Set-BatteryLidBalancedPlan
 }
 
-################################################################################################################
 
-Set-Power-Saver-Plan
-Set-High-Performance-Plan
-Set-Balanced-Plan
+Set-PowerSaverPlan
+Set-HighPerformancePlan
+Set-BalancedPlan
 
 <################################################################################################################
 Configuration des registres
@@ -322,3 +318,6 @@ Add-LocalGroupMember -Group "Administrateurs" -Member "$username"
 Redéfinition de la politique d'exécution 
 ################################################################################################################>
 Set-ExecutionPolicy -ExecutionPolicy Undefined
+
+Restart-Computer
+
