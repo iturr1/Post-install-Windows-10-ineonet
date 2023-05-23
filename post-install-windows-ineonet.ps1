@@ -98,8 +98,9 @@ Start-BitsTransfer -Source https://aka.ms/vs/16/release/VC_redist.x86.exe -Desti
 Start-Process -FilePath "C:\Windows\Temp\VC_redist.x86.exe" -Verb RunAs -Wait
 Start-BitsTransfer -Source https://aka.ms/vs/16/release/VC_redist.x64.exe -Destination C:\Windows\Temp\ 
 Start-Process -FilePath "C:\Windows\Temp\VC_redist.x64.exe" -Verb RunAs -Wait
-Start-BitsTransfer -Source https://eu.ninjarmm.com/agent/installer/6a9b20b6-8220-4461-b67e-b18380d9bb5c/1nouvelassetbureauprincipala1d4b1-5.3.6261-windows-installer.msi -Destination C:\Windows\Temp
-Start-Process -FilePath "C:\Windows\Temp\1nouvelassetbureauprincipala1d4b1-5.3.6261-windows-installer.msi" -Verb RunAs -Wait
+Start-BitsTransfer -Source https://eu.ninjarmm.com/agent/installer/6a9b20b6-8220-4461-b67e-b18380d9bb5c/1nouvelassetbureauprincipala1d4b1-5.3.6261-windows-installer.msi `
+    -Destination C:\Windows\Temp
+Start-Process msiexe.exe -Wait -ArgumentList '/I C:\Windows\Temp\1nouvelassetbureauprincipala1d4b1-5.3.6261-windows-installer.msi /quiet' -Verb RunAs -Wait
 Start-BitsTransfer -Source https://download.microsoft.com/download/2/7/A/27AF1BE6-DD20-4CB4-B154-EBAB8A7D4A7E/officedeploymenttool_16327-20214.exe -Destination C:\Windows\Temp
 Start-Process -FilePath "C:\Windows\Temp\officedeploymenttool_16327-20214.exe" -Verb RunAs -Wait
 
@@ -118,12 +119,24 @@ Stop-Process -processName: Explorer -force # Redémarrer le service Explorer
 Activer / Désactiver fonctionaliées Windows
 ################################################################################################################>
 
+ #Activer SMB/CIFS
+ 
+Do {
+    $activateSMB1 = Read-Host "Veuillez-vous activer le protocol SMB1 ? [o/n]"
+    if (($activateSMB1 -ine "O") -or ($activateSMB1 -ine "n")) {
+        Write-Host "Choisissez O pour Oui ou N pour Non"
+    }
+} while (($activateSMB1 -ine "o") -or ($activateSMB1 -ine "n"))
 
-#Activer SMB/CIFS
-Enable-WindowsOptionalFeature -FeatureName SMB1Protocol -Online -NoRestart
-Enable-WindowsOptionalFeature -FeatureName SMB1Protocol-Client -Online -NoRestart
-Enable-WindowsOptionalFeature -FeatureName SMB1Protocol-Server -Online -NoRestart
-Enable-WindowsOptionalFeature -FeatureName SmbDirect -Online -NoRestart
+if ($activateSMB1 -ieq "o") {
+
+    Enable-WindowsOptionalFeature -FeatureName SMB1Protocol -Online -NoRestart
+    Enable-WindowsOptionalFeature -FeatureName SMB1Protocol-Client -Online -NoRestart
+    Enable-WindowsOptionalFeature -FeatureName SMB1Protocol-Server -Online -NoRestart
+    Enable-WindowsOptionalFeature -FeatureName SmbDirect -Online -NoRestart
+} elseif ($activateSMB1 -ieq "n") {
+    break
+}
 
 #Activation Framework .NET
 Enable-WindowsOptionalFeature -FeatureName IIS-ASP -Online -All -NoRestart
@@ -283,7 +296,22 @@ Configuration des registres
 ################################################################################################################>
 
 #Désactiver UAC -> User Access Control
-Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\" -Name "EnableLUA" -Value 0 -Force
+
+Do {
+    $deactivateUAC = Read-Host "Veuillez-vous activer l'UAC -> User Access Control' ? [o/n]"
+    if (($deactivateUAC -ine "O") -or ($deactivateUAC -ine "n")) {
+        Write-Host "Choisissez O pour Oui ou N pour Non"
+    }
+} while (($deactivateUAC -ine "o") -or ($deactivateUAC -ine "n"))
+
+if ($deactivateUAC -ieq "o") {
+
+    Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\" -Name "EnableLUA" -Value 0 -Force
+
+} elseif ($activateSMB1 -ieq "n") {
+    break
+}
+
 
 #Désactivation Actualitées Windows
 Set-ItemProperty -Path "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Feeds" -Name "ShellFeedsTaskbarViewMode" -Value 2 -force
@@ -318,6 +346,14 @@ Add-LocalGroupMember -Group "Administrateurs" -Member "$username"
 Redéfinition de la politique d'exécution 
 ################################################################################################################>
 Set-ExecutionPolicy -ExecutionPolicy Undefined
+<################################################################################################################
+Redémarrer la machine
+################################################################################################################>
+
+Write-Host "L'ordinateur va redémarrer en ... `n"
+
+5..1 | ForEach-Object {"$_"; Start-Sleep -Seconds 1} 
 
 Restart-Computer
+
 
